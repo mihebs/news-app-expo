@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   StyleSheet,
   ActivityIndicator,
   StatusBar,
@@ -56,15 +56,23 @@ export default function App() {
         <Text style={styles.counter}>{newsList.length} notícias encontradas</Text>
       )}
 
-      <ScrollView contentContainerStyle={styles.list}>
-        {newsList.map((item) => (
+      <FlatList
+        data={newsList}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
           <News
-            key={item.id}
             news={item}
             onPress={(id) => console.log('pressionou', id)}
           />
-        ))}
-      </ScrollView>
+        )}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text>Nenhuma notícia disponível no momento.</Text>
+          </View>
+        }
+      />
     </View>
   );
 }
@@ -98,5 +106,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 13,
     color: '#666',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginHorizontal: 16,
+  },
+  empty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 32,
   },
 });
