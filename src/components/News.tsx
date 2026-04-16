@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -14,22 +14,36 @@ interface NewsProps {
 }
 
 export default function News({ news, onPress }: NewsProps) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={() => onPress(news.id)}
     >
       {news.image ? (
-        <Image
-          source={{ uri: news.image }}
-          style={styles.image}
-        />
+        imageError ? (
+          <View style={styles.fallbackImage}>
+            <Text style={styles.fallbackText}>Sem imagem</Text>
+          </View>
+        ) : (
+          <Image
+            source={{ uri: news.image }}
+            style={styles.image}
+            onError={() => setImageError(true)}
+          />
+        )
       ) : null}
 
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>
           {news.title}
         </Text>
+        {news.summary ? (
+          <Text style={styles.summary} numberOfLines={2}>
+            {news.summary}
+          </Text>
+        ) : null}
         <Text style={styles.date}>{news.published}</Text>
       </View>
     </TouchableOpacity>
@@ -66,5 +80,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 6,
+  },
+  summary: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 4,
+  },
+  fallbackImage: {
+    width: '100%',
+    height: 180,
+    backgroundColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fallbackText: {
+    color: '#333',
+    fontWeight: 'bold',
   },
 });

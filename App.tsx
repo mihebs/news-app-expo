@@ -52,6 +52,10 @@ export default function App() {
         <Text style={styles.headerTitle}>📰 News App</Text>
       </View>
 
+      {!loading && !error && (
+        <Text style={styles.counter}>{newsList.length} notícias encontradas</Text>
+      )}
+
       <ScrollView contentContainerStyle={styles.list}>
         {newsList.map((item) => (
           <News
@@ -88,5 +92,11 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 16,
+  },
+  counter: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    fontSize: 13,
+    color: '#666',
   },
 });
