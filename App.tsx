@@ -1,223 +1,90 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, ActivityIndicator, Platform, StatusBar as RNStatusBar, TextInput, TouchableOpacity, Modal } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  StatusBar,
+  Platform,
+} from 'react-native';
+import { fetchNews, NewsData } from './src/utils/handle-api';
 import News from './src/components/News';
-import NewsDetail from './src/components/NewsDetail';
-import { globalStyles } from './src/styles/global';
-
-import { fetchNewsService, NewsData } from './src/utils/handle-api';
 
 export default function App() {
   const [newsList, setNewsList] = useState<NewsData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [selectedNews, setSelectedNews] = useState<NewsData | null>(null);
 
   useEffect(() => {
-    fetchNews();
+    fetchNews()
+      .then((data) => {
+        setNewsList(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Falha ao carregar notícias.');
+        setLoading(false);
+      });
   }, []);
 
-  const fetchNews = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchNewsService();
-      setNewsList(data);
-    } catch (err: any) {
-      setError(err.message || "Erro ao obter notícias");
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" />
+        <Text>Carregando notícias...</Text>
+      </View>
+    );
+  }
 
-  const filteredAndSortedNews = useMemo(() => {
-    let result = newsList;
-
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter((news) =>
-        news.title.toLowerCase().includes(lowerQuery)
-      );
-    }
-
-    result = [...result].sort((a, b) => {
-      const dateA = new Date(a.published).getTime();
-      const dateB = new Date(b.published).getTime();
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-    });
-
-    return result;
-  }, [newsList, searchQuery, sortOrder]);
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text>{error}</Text>
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
-      
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Últimas notícias</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar notícias..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity
-          style={[
-            styles.sortButton,
-            sortOrder === 'asc' && styles.sortButtonActive
-          ]}
-          onPress={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
-        >
-          <Text
-            style={[
-              styles.sortButtonText,
-              sortOrder === 'asc' && styles.sortButtonTextActive
-            ]}
-          >
-            {sortOrder === 'asc' ? '↑ Mais antigas' : '↓ Mais recentes'}
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>📰 News App</Text>
       </View>
 
-      {!loading && !error && (
-        <Text style={styles.counterText}>
-          {filteredAndSortedNews.length} notícias encontradas
-        </Text>
-      )}
-
-      {loading ? (
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text style={styles.loadingText}>Carregando notícias...</Text>
-        </View>
-      ) : error ? (
-        <View style={styles.centerContainer}>
-          <Text style={styles.errorText}>Erro: {error}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredAndSortedNews}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.scrollContent}
-          renderItem={({ item }) => (
-            <News
-              title={item.title}
-              summary={item.summary}
-              image={item.image}
-              published={item.published}
-              link={item.link}
-              onPress={() => setSelectedNews(item)}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Nenhuma notícia disponível no momento.</Text>
-            </View>
-          }
-        />
-      )}
-
-      <Modal
-        visible={selectedNews !== null}
-        animationType="slide"
-        onRequestClose={() => setSelectedNews(null)}
-      >
-        <NewsDetail
-          news={selectedNews}
-          onClose={() => setSelectedNews(null)}
-        />
-      </Modal>
-    </SafeAreaView>
+      <ScrollView contentContainerStyle={styles.list}>
+        {newsList.map((item) => (
+          <News
+            key={item.id}
+            news={item}
+            onPress={(id) => console.log('pressionou', id)}
+          />
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: globalStyles.backgroundColor,
   },
   header: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    alignItems: 'center',
-    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0,
+    backgroundColor: '#1a1a2e',
+    paddingTop: 40,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
   },
   headerTitle: {
+    color: '#fff',
     fontSize: 22,
     fontWeight: 'bold',
   },
-  searchInput: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginTop: 12,
-    backgroundColor: '#fff',
-  },
-  sortButton: {
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    width: '100%',
-  },
-  sortButtonActive: {
-    backgroundColor: globalStyles.primaryColor || '#007bff',
-  },
-  sortButtonText: {
-    color: '#333',
-    fontWeight: '600',
-  },
-  sortButtonTextActive: {
-    color: '#fff',
-  },
-  counterText: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 4,
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  centerContainer: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: {
-    marginTop: 10,
-    fontSize: globalStyles.bodyFontSize,
-    color: '#666',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-  },
-  scrollContent: {
+  list: {
     padding: 16,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#e0e0e0',
-    marginHorizontal: 16,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
   },
 });

@@ -1,19 +1,27 @@
 export interface NewsData {
-  id: number;
   title: string;
-  summary: string;
-  link: string;
+  summary: string | null;
+  image: string | null;
   published: string;
-  image?: string | null;
+  link: string;
+  id: string;
 }
 
-export const fetchNewsService = async (): Promise<NewsData[]> => {
-  const response = await fetch('https://api.first.org/data/v1/news');
-  const json = await response.json();
-  
-  if (json && json.data) {
-    return json.data;
-  } else {
-    throw new Error("Falha ao obter notícias");
+export async function fetchNews(): Promise<NewsData[]> {
+  try {
+    const response = await fetch('https://api.first.org/data/v1/news');
+    const json = await response.json();
+    const rawItems = Object.values(json.data) as any[];
+    return rawItems.map((item, index) => ({
+      id: String(index),
+      title: item.title ?? 'Sem título',
+      summary: item.summary ?? null,
+      image: item.image ?? null,
+      published: item.published ?? '',
+      link: item.link ?? '',
+    }));
+  } catch (error) {
+    console.error('Erro ao buscar notícias:', error);
+    return [];
   }
-};
+}

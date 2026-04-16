@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "News App",
-    "slug": "news-app-renan",
-    "version": "1.0.0",
+    "name": "PREENCHER_AQUI",
+    "slug": "PREENCHER_AQUI",
+    "version": "PREENCHER_AQUI",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,19 +11,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "PREENCHER_AQUI"
+    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.renan.newsapp"
-    },
-    "android": {
-      "package": "com.renan.newsapp",
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
+      "bundleIdentifier": "PREENCHER_AQUI"
     },
     "web": {
       "favicon": "./assets/favicon.png"
