@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { fetchNews, NewsData } from './src/utils/handle-api';
 import News from './src/components/News';
+import { globalStyles } from './src/styles/global';
 
 export default function App() {
   const [newsList, setNewsList] = useState<NewsData[]>([]);
@@ -32,7 +33,7 @@ export default function App() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" />
-        <Text>Carregando notícias...</Text>
+        <Text style={{ fontSize: globalStyles.bodyFontSize }}>Carregando notícias...</Text>
       </View>
     );
   }
@@ -67,10 +68,11 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: globalStyles.backgroundColor,
   },
   header: {
     backgroundColor: '#1a1a2e',
-    paddingTop: 40,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0,
     paddingBottom: 16,
     paddingHorizontal: 16,
   },
