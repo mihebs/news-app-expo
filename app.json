@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "PREENCHER_AQUI",
-    "slug": "PREENCHER_AQUI",
-    "version": "PREENCHER_AQUI",
+    "name": "News App",
+    "slug": "news-app-expo",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,11 +16,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "PREENCHER_AQUI"
+      "package": "com.newsapp.expo"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "PREENCHER_AQUI"
+      "bundleIdentifier": "com.newsapp.expo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
