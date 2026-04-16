@@ -10,7 +10,7 @@ import { NewsData } from '../utils/handle-api';
 
 interface NewsProps {
   news: NewsData;
-  onPress: (id: string) => void;
+  onPress: (news: NewsData) => void;
 }
 
 export default function News({ news, onPress }: NewsProps) {
@@ -19,7 +19,7 @@ export default function News({ news, onPress }: NewsProps) {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => onPress(news.id)}
+      onPress={() => onPress(news)}
     >
       {news.image ? (
         imageError ? (

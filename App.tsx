@@ -9,9 +9,11 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { fetchNews, NewsData } from './src/utils/handle-api';
 import News from './src/components/News';
+import NewsDetail from './src/components/NewsDetail';
 import { globalStyles } from './src/styles/global';
 
 export default function App() {
@@ -20,6 +22,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedNews, setSelectedNews] = useState<NewsData | null>(null);
 
   const filteredList = useMemo(() => {
     let result = newsList;
@@ -95,7 +98,7 @@ export default function App() {
         renderItem={({ item }) => (
           <News
             news={item}
-            onPress={(id) => console.log('pressionou', id)}
+            onPress={(news) => setSelectedNews(news)}
           />
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -105,6 +108,13 @@ export default function App() {
           </View>
         }
       />
+      <Modal
+        visible={selectedNews !== null}
+        animationType="slide"
+        onRequestClose={() => setSelectedNews(null)}
+      >
+        <NewsDetail news={selectedNews} onClose={() => setSelectedNews(null)} />
+      </Modal>
     </View>
   );
 }
